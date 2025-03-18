@@ -2,14 +2,21 @@ import fs from "fs/promises";
 
 const restore = async (db, snapshotId, outputDirectory) => {
   const files = await db.query({
-    text: "SELECT contents, name FROM snapshot_file JOIN file ON snapshot_file.file_id=file.id WHERE snapshot_id = $1",
+    text: "SELECT contents, path FROM snapshot_file JOIN file ON snapshot_file.file_id=file.id WHERE snapshot_id = $1",
     values: [snapshotId],
   });
 
-  console.log(files);
-
   for (const file of files.rows) {
-    await fs.writeFile(`${outputDirectory}/${file.name}`, file.contents);
+    // Ensure the directory exists
+    await fs.mkdir(
+      `${outputDirectory}/${file.path.substring(
+        0,
+        file.path.lastIndexOf("/")
+      )}`,
+      { recursive: true }
+    );
+    // Write the file
+    await fs.writeFile(`${outputDirectory}/${file.path}`, file.contents);
   }
 };
 

@@ -1,22 +1,45 @@
 import fs from "fs/promises";
 import crypto from "crypto";
 
-const snapshotDirectory = async (db, directoryName, snapshotId) => {
+const snapshotDirectory = async (
+  db,
+  directoryName,
+  snapshotId,
+  subdirectoryName = ""
+) => {
+  const fullPath = `${directoryName}${
+    subdirectoryName ? "/" + subdirectoryName : ""
+  }`;
+
   let files;
   try {
-    files = await fs.readdir(directoryName);
+    files = await fs.readdir(fullPath);
   } catch (e) {
-    console.error(`Directory "${directoryName}" does not exist`);
+    console.error(`Directory "${fullPath}" does not exist`);
     process.exit(1);
   }
 
+  // loop through every file in the directory
   for (const fileName of files) {
-    const filePath = `${directoryName}/${fileName}`;
+    const filePath = `${fullPath}/${fileName}`;
+
+    const stat = await fs.lstat(filePath);
+    if (stat.isDirectory()) {
+      // recursively snapshot subdirectories
+      await snapshotDirectory(
+        db,
+        directoryName,
+        snapshotId,
+        `${subdirectoryName}${fileName}/`
+      );
+      continue;
+    }
+
     let contents;
     try {
       contents = await fs.readFile(filePath);
     } catch (e) {
-      //console.error(`Failed to read file "${filePath}":`, e.message);
+      console.error(`Failed to read file "${filePath}":`, e.message);
       continue;
     }
 
@@ -29,9 +52,11 @@ const snapshotDirectory = async (db, directoryName, snapshotId) => {
       values: [sha],
     });
 
+    // check if the file already exists in the database
     if (existingFile.rows.length > 0) {
       fileId = existingFile.rows[0].id;
     } else {
+      // if the file doesn't exist, insert it into the database
       const insertResult = await db.query({
         text: "INSERT INTO file (contents, sha) VALUES ($1, $2) RETURNING id",
         values: [contents, sha],
@@ -40,8 +65,8 @@ const snapshotDirectory = async (db, directoryName, snapshotId) => {
     }
 
     await db.query({
-      text: "INSERT INTO snapshot_file (snapshot_id, file_id, name) VALUES ($1, $2, $3)",
-      values: [snapshotId, fileId, fileName],
+      text: "INSERT INTO snapshot_file (snapshot_id, file_id, path) VALUES ($1, $2, $3)",
+      values: [snapshotId, fileId, `${subdirectoryName}${fileName}`],
     });
   }
 };

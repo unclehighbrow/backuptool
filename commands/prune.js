@@ -1,4 +1,5 @@
 const prune = async (db, snapshotId) => {
+  // find every file that isn't referenced by another snapshot
   const filesToDelete = await db.query({
     text: `SELECT sf1.file_id AS file_id FROM snapshot_file sf1 
             LEFT JOIN snapshot_file sf2 ON sf1.file_id=sf1.file_id AND sf2.snapshot_id!=sf1.snapshot_id
