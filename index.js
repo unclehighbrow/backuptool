@@ -1,11 +1,17 @@
 import list from "./commands/list.js";
+import snapshot from "./commands/snapshot.js";
 
 const args = process.argv.slice(2);
 const command = args[0];
 
 switch (command) {
   case "snapshot":
-    console.log("TODO: snapshot command");
+    const directoryName = args[1];
+    if (!directoryName) {
+      console.error("Please provide a directory name");
+      process.exit(1);
+    }
+    snapshot(directoryName);
     break;
   case "restore":
     console.log("TODO: restore command");
