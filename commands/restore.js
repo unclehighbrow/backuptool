@@ -8,13 +8,12 @@ const restore = async (db, snapshotId, outputDirectory) => {
 
   for (const file of files.rows) {
     // Ensure the directory exists
-    await fs.mkdir(
-      `${outputDirectory}/${file.path.substring(
-        0,
-        file.path.lastIndexOf("/")
-      )}`,
-      { recursive: true }
-    );
+    const directoriesToMake = `${outputDirectory}/${file.path.substring(
+      0,
+      file.path.lastIndexOf("/")
+    )}`;
+
+    await fs.mkdir(directoriesToMake, { recursive: true });
     // Write the file
     await fs.writeFile(`${outputDirectory}/${file.path}`, file.contents);
   }
