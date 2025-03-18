@@ -1,0 +1,24 @@
+{
+  "name": "snapshot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "backuptool": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unclehighbrow/snapshot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/unclehighbrow/snapshot/issues"
+  },
+  "homepage": "https://github.com/unclehighbrow/snapshot#readme",
+  "description": "",
+  "dependencies": {
+    "pg": "^8.14.1"
+  },
+  "type": "module"
+}
