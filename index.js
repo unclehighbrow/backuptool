@@ -8,7 +8,7 @@ import prune from "./commands/prune.js";
   const args = process.argv.slice(2);
   const command = args[0];
 
-  const db = await _db();
+  const db = await _db("backuptool");
 
   switch (command) {
     case "snapshot":

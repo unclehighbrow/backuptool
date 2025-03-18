@@ -1,8 +1,8 @@
 import pg from "pg";
 
-const db = async () => {
+const db = async (database) => {
   const { Client } = pg;
-  const client = new Client({ database: "backuptool" });
+  const client = new Client({ database });
   await client.connect();
   return client;
 };
