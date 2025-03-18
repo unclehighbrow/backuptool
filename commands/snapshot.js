@@ -1,9 +1,7 @@
-import _db from "../db.js";
 import fs from "fs/promises";
 import crypto from "crypto";
 
-const snapshot = async (directoryName) => {
-  const db = await _db();
+const snapshot = async (db, directoryName) => {
   const newSnapshot = await db.query({
     text: "INSERT INTO snapshot (directory_name) VALUES ($1) RETURNING id",
     values: [directoryName],
