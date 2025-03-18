@@ -1,6 +1,7 @@
 import _db from "./db.js";
 import list from "./commands/list.js";
 import snapshot from "./commands/snapshot.js";
+import restore from "./commands/restore.js";
 
 (async () => {
   const args = process.argv.slice(2);
@@ -18,7 +19,17 @@ import snapshot from "./commands/snapshot.js";
       await snapshot(db, directoryName);
       break;
     case "restore":
-      console.log("TODO: restore command");
+      const snapshotId = args[1];
+      if (!snapshotId) {
+        console.error("Please provide a snapshot ID");
+        process.exit(1);
+      }
+      const outputDirectory = args[2];
+      if (!outputDirectory) {
+        console.error("Please provide an output directory");
+        process.exit(1);
+      }
+      await restore(db, snapshotId, outputDirectory);
       break;
     case "prune":
       console.log("TODO: prune command");

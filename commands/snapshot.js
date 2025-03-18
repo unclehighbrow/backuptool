@@ -10,8 +10,8 @@ const snapshotDirectory = async (db, directoryName, snapshotId) => {
     process.exit(1);
   }
 
-  for (const file of files) {
-    const filePath = `${directoryName}/${file}`;
+  for (const fileName of files) {
+    const filePath = `${directoryName}/${fileName}`;
     let contents;
     try {
       contents = await fs.readFile(filePath);
@@ -40,8 +40,8 @@ const snapshotDirectory = async (db, directoryName, snapshotId) => {
     }
 
     await db.query({
-      text: "INSERT INTO snapshot_file (snapshot_id, file_id) VALUES ($1, $2)",
-      values: [snapshotId, fileId],
+      text: "INSERT INTO snapshot_file (snapshot_id, file_id, name) VALUES ($1, $2, $3)",
+      values: [snapshotId, fileId, fileName],
     });
   }
 };
