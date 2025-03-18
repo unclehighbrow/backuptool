@@ -1,12 +1,7 @@
 import fs from "fs/promises";
 import crypto from "crypto";
 
-const snapshot = async (db, directoryName) => {
-  const newSnapshot = await db.query({
-    text: "INSERT INTO snapshot (directory_name) VALUES ($1) RETURNING id",
-    values: [directoryName],
-  });
-
+const snapshotDirectory = async (db, directoryName, snapshotId) => {
   let files;
   try {
     files = await fs.readdir(directoryName);
@@ -46,9 +41,18 @@ const snapshot = async (db, directoryName) => {
 
     await db.query({
       text: "INSERT INTO snapshot_file (snapshot_id, file_id) VALUES ($1, $2)",
-      values: [newSnapshot.rows[0].id, fileId],
+      values: [snapshotId, fileId],
     });
   }
+};
+
+const snapshot = async (db, directoryName) => {
+  const newSnapshot = await db.query({
+    text: "INSERT INTO snapshot (directory_name) VALUES ($1) RETURNING id",
+    values: [directoryName],
+  });
+
+  await snapshotDirectory(db, directoryName, newSnapshot.rows[0].id);
 
   await db.end();
 };
