@@ -2,6 +2,7 @@ import _db from "./db.js";
 import list from "./commands/list.js";
 import snapshot from "./commands/snapshot.js";
 import restore from "./commands/restore.js";
+import prune from "./commands/prune.js";
 
 (async () => {
   const args = process.argv.slice(2);
@@ -19,8 +20,8 @@ import restore from "./commands/restore.js";
       await snapshot(db, directoryName);
       break;
     case "restore":
-      const snapshotId = args[1];
-      if (!snapshotId) {
+      const restoreSnapshotId = args[1];
+      if (!restoreSnapshotId) {
         console.error("Please provide a snapshot ID");
         process.exit(1);
       }
@@ -29,10 +30,15 @@ import restore from "./commands/restore.js";
         console.error("Please provide an output directory");
         process.exit(1);
       }
-      await restore(db, snapshotId, outputDirectory);
+      await restore(db, restoreSnapshotId, outputDirectory);
       break;
     case "prune":
-      console.log("TODO: prune command");
+      const pruneSnapshotId = args[1];
+      if (!pruneSnapshotId) {
+        console.error("Please provide a snapshot ID");
+        process.exit(1);
+      }
+      await prune(db, pruneSnapshotId);
       break;
     case "list":
       await list(db);

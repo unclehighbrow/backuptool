@@ -53,8 +53,6 @@ const snapshot = async (db, directoryName) => {
   });
 
   await snapshotDirectory(db, directoryName, newSnapshot.rows[0].id);
-
-  await db.end();
 };
 
 export default snapshot;
