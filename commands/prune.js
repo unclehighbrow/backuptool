@@ -1,6 +1,5 @@
 const prune = async (db, snapshotId) => {
   const filesToDelete = await db.query({
-    // TODO: does this work if there are two files that are the same in a snapshot?
     text: `SELECT sf1.file_id AS file_id FROM snapshot_file sf1 
             LEFT JOIN snapshot_file sf2 ON sf1.file_id=sf1.file_id AND sf2.snapshot_id!=sf1.snapshot_id
             WHERE sf1.snapshot_id = $1 AND sf2.id IS NULL`,
