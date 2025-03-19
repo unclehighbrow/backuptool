@@ -1,3 +1,4 @@
+import fs from "fs/promises";
 import _db from "../db.js";
 import init from "../init.js";
 import snapshot from "../commands/snapshot.js";
@@ -24,6 +25,23 @@ test("snapshot stores the right amount of data", async () => {
   expect(snapshotFileResult.rows.length).toBe(6);
   const fileResult = await db.query("SELECT * FROM file");
   expect(fileResult.rows.length).toBe(5);
+});
+
+test("snapshot will restore files that have changed after restore", async () => {
+  await snapshot(db, "test/test_folders/snapshot1");
+  await restore(db, 1, "test/test_result_folders/restore1");
+
+  await fs.unlink("test/test_result_folders/restore1/nes-asm-back.png");
+  await fs.copyFile(
+    "test/test_result_folders/restore1/okay_in_japanese.txt",
+    "test/test_result_folders/restore1/same_file.txt"
+  );
+  await restore(db, 1, "test/test_result_folders/restore1");
+
+  await compareDirectories(
+    "test/test_folders/snapshot1",
+    "test/test_result_folders/restore1"
+  );
 });
 
 test("snapshotting twice doesn't store the files twice", async () => {
