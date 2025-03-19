@@ -33,6 +33,7 @@ test("restore restores all files", async () => {
     "test/test_folders/snapshot1",
     "test/test_result_folders/restore1"
   );
+
   await snapshot(db, "test/test_folders/snapshot2");
   await restore(db, 2, "test/test_result_folders/restore2");
   await compareDirectories(
@@ -44,13 +45,16 @@ test("restore restores all files", async () => {
 test("prunes without deleting data in other snapshots", async () => {
   await snapshot(db, "test/test_folders/snapshot1");
   await snapshot(db, "test/test_folders/snapshot2");
+
   const snapshotResult = await db.query("SELECT * FROM snapshot");
   expect(snapshotResult.rows.length).toBe(2);
   const snapshotFileResult = await db.query("SELECT * FROM snapshot_file");
   expect(snapshotFileResult.rows.length).toBe(10);
   const fileResult = await db.query("SELECT * FROM file");
   expect(fileResult.rows.length).toBe(6);
+
   await prune(db, 2);
+
   const snapshotResult2 = await db.query("SELECT * FROM snapshot");
   expect(snapshotResult2.rows.length).toBe(1);
   const snapshotFileResult2 = await db.query("SELECT * FROM snapshot_file");
