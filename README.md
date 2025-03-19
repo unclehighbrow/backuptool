@@ -19,7 +19,7 @@ After you initialize the database, you can `snapshot`, `list`, `restore`, and `p
 
 ### Snapshot
 ```
-  npm run backuptool snapshot {directory_path}
+  npm run backuptool snapshot {path}
 ```
 
 ### List
@@ -31,7 +31,7 @@ After you initialize the database, you can `snapshot`, `list`, `restore`, and `p
 ### Restore
   To restore your snapshot, provide the id of the snapshot you found in the list like so:
 ```
-  npm run backuptool restore {id} {directory_path}
+  npm run backuptool restore {id} {path}
 ```
 
 ### Prune
