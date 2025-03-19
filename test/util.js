@@ -21,9 +21,9 @@ export const compareDirectories = async (dir1, dir2) => {
       continue;
     }
 
-    const contents1 = await fs.readFile(filePath1, "hex");
-    const contents2 = await fs.readFile(filePath2, "hex");
+    const contents1 = await fs.readFile(filePath1);
+    const contents2 = await fs.readFile(filePath2);
 
-    expect(contents1).toBe(contents2);
+    expect(contents1).toStrictEqual(contents2);
   }
 };
