@@ -6,7 +6,7 @@ beforeEach(async () => {
   await init("backuptool_test");
 });
 
-test("snapshot", async () => {
+test("snapshot stores the right amount of data", async () => {
   const db = await _db("backuptool_test");
   await snapshot(db, "test/test_folders/snapshot1");
   const snapshotResult = await db.query("SELECT * FROM snapshot");
