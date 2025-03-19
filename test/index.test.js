@@ -26,6 +26,14 @@ test("snapshot stores the right amount of data", async () => {
   expect(fileResult.rows.length).toBe(5);
 });
 
+test("snapshotting twice doesn't store the files twice", async () => {
+  await snapshot(db, "test/test_folders/snapshot1");
+  const fileResult = await db.query("SELECT * FROM file");
+  await snapshot(db, "test/test_folders/snapshot1");
+  const fileResult2 = await db.query("SELECT * FROM file");
+  expect(fileResult.rows).toEqual(fileResult2.rows);
+});
+
 test("restore restores all files", async () => {
   await snapshot(db, "test/test_folders/snapshot1");
   await restore(db, 1, "test/test_result_folders/restore1");
