@@ -3,7 +3,7 @@
 ## Install
 You should have postgres preinstalled. This was written and tested with postgres 15, but any recent version should do. 
 Then, just initalize the database with:
-  ```npm run init````
+  ```npm run init```
 
 ## Tests
 To run the tests:
