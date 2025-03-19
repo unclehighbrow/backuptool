@@ -1,5 +1,5 @@
 # Backuptool
-This is backuptool, a command line tool for snapshotting the contents of a directory and then restoring them.
+This is `backuptool`, a command line tool for snapshotting the contents of a directory and then restoring them.
 
 ## Install
 You should have postgres preinstalled. This was written and tested with postgres 15, but any recent version should do. 
