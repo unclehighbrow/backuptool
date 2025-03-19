@@ -1,4 +1,4 @@
-# backuptool
+# Backuptool
 This is backuptool, a command line tool for snapshotting the contents of a directory and then restoring them.
 
 ## Install
