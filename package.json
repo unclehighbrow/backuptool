@@ -5,7 +5,7 @@
   "scripts": {
     "test": "node test/index.js",
     "backuptool": "node index.js",
-    "init": "node init.js"
+    "init": "node run_init.js"
   },
   "repository": {
     "type": "git",
