@@ -1,6 +1,8 @@
 import _db from "../db.js";
 import init from "../init.js";
 import snapshot from "../commands/snapshot.js";
+import restore from "../commands/restore.js";
+import { compareDirectories } from "./util.js";
 
 beforeEach(async () => {
   await init("backuptool_test");
@@ -15,5 +17,16 @@ test("snapshot stores the right amount of data", async () => {
   expect(snapshotFileResult.rows.length).toBe(8);
   const fileResult = await db.query("SELECT * FROM file");
   expect(fileResult.rows.length).toBe(7);
+  db.end();
+});
+
+test("restore restores all files", async () => {
+  const db = await _db("backuptool_test");
+  await snapshot(db, "test/test_folders/snapshot1");
+  await restore(db, 1, "test/test_result_folders/restore1");
+  await compareDirectories(
+    "test/test_folders/snapshot1",
+    "test/test_result_folders/restore1"
+  );
   db.end();
 });
