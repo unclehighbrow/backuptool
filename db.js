@@ -1,10 +1,7 @@
-import pg from "pg";
+import { DatabaseSync } from "node:sqlite";
 
-const db = async (database) => {
-  const { Client } = pg;
-  const client = new Client({ database });
-  await client.connect();
-  return client;
+const db = (database) => {
+  return new DatabaseSync(`./${database}.db`);
 };
 
 export default db;

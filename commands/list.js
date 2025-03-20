@@ -1,5 +1,5 @@
 const list = async (db) => {
-  const res = await db.query("SELECT * FROM snapshot");
-  console.table(res.rows);
+  const res = await db.prepare("SELECT * FROM snapshot").all();
+  console.table(res);
 };
 export default list;

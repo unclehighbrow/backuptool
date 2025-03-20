@@ -8,23 +8,27 @@ import { compareDirectories } from "./util.js";
 
 let db;
 
-beforeEach(async () => {
-  await init("backuptool_test");
-  db = await _db("backuptool_test");
+beforeEach(() => {
+  init("backuptool_test");
+  db = _db("backuptool_test");
 });
 
 afterEach(async () => {
-  await db.end();
+  await db.close();
 });
 
 test("snapshot stores the right amount of data", async () => {
   await snapshot(db, "test/test_folders/snapshot1");
-  const snapshotResult = await db.query("SELECT * FROM snapshot");
-  expect(snapshotResult.rows.length).toBe(1);
-  const snapshotFileResult = await db.query("SELECT * FROM snapshot_file");
-  expect(snapshotFileResult.rows.length).toBe(6);
-  const fileResult = await db.query("SELECT * FROM file");
-  expect(fileResult.rows.length).toBe(5);
+  const snapshotResult = await db
+    .prepare("SELECT COUNT(*) AS cnt FROM snapshot")
+    .get();
+  expect(snapshotResult.cnt).toBe(1);
+  const snapshotFileResult = await db
+    .prepare("SELECT COUNT(*) AS cnt FROM snapshot_file")
+    .get();
+  expect(snapshotFileResult.cnt).toBe(6);
+  const fileResult = await db.prepare("SELECT COUNT(*) AS cnt FROM file").get();
+  expect(fileResult.cnt).toBe(5);
 });
 
 test("snapshot will restore files that have changed after restore", async () => {
@@ -46,10 +50,12 @@ test("snapshot will restore files that have changed after restore", async () => 
 
 test("snapshotting twice doesn't store the files twice", async () => {
   await snapshot(db, "test/test_folders/snapshot1");
-  const fileResult = await db.query("SELECT * FROM file");
+  const fileResult = await db.prepare("SELECT COUNT(*) AS cnt FROM file").get();
   await snapshot(db, "test/test_folders/snapshot1");
-  const fileResult2 = await db.query("SELECT * FROM file");
-  expect(fileResult.rows).toEqual(fileResult2.rows);
+  const fileResult2 = await db
+    .prepare("SELECT COUNT(*) AS cnt FROM file")
+    .get();
+  expect(fileResult.cnt).toEqual(fileResult2.cnt);
 });
 
 test("restore restores all files", async () => {
@@ -72,19 +78,29 @@ test("prunes without deleting data in other snapshots", async () => {
   await snapshot(db, "test/test_folders/snapshot1");
   await snapshot(db, "test/test_folders/snapshot2");
 
-  const snapshotResult = await db.query("SELECT * FROM snapshot");
-  expect(snapshotResult.rows.length).toBe(2);
-  const snapshotFileResult = await db.query("SELECT * FROM snapshot_file");
-  expect(snapshotFileResult.rows.length).toBe(10);
-  const fileResult = await db.query("SELECT * FROM file");
-  expect(fileResult.rows.length).toBe(6);
+  const snapshotResult = await db
+    .prepare("SELECT COUNT(*) AS cnt FROM snapshot")
+    .get();
+  expect(snapshotResult.cnt).toBe(2);
+  const snapshotFileResult = await db
+    .prepare("SELECT COUNT(*) AS cnt FROM snapshot_file")
+    .get();
+  expect(snapshotFileResult.cnt).toBe(10);
+  const fileResult = await db.prepare("SELECT COUNT(*) AS cnt FROM file").get();
+  expect(fileResult.cnt).toBe(6);
 
   await prune(db, 2);
 
-  const snapshotResult2 = await db.query("SELECT * FROM snapshot");
-  expect(snapshotResult2.rows.length).toBe(1);
-  const snapshotFileResult2 = await db.query("SELECT * FROM snapshot_file");
-  expect(snapshotFileResult2.rows.length).toBe(6);
-  const fileResult2 = await db.query("SELECT * FROM file");
-  expect(fileResult2.rows.length).toBe(5);
+  const snapshotResult2 = await db
+    .prepare("SELECT COUNT(*) AS cnt FROM snapshot")
+    .get();
+  expect(snapshotResult2.cnt).toBe(1);
+  const snapshotFileResult2 = await db
+    .prepare("SELECT COUNT(*) AS cnt FROM snapshot_file")
+    .get();
+  expect(snapshotFileResult2.cnt).toBe(6);
+  const fileResult2 = await db
+    .prepare("SELECT COUNT(*) AS cnt FROM file")
+    .get();
+  expect(fileResult2.cnt).toBe(5);
 });

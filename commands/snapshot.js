@@ -47,37 +47,35 @@ const snapshotDirectory = async (
 
     let fileId;
 
-    const existingFile = await db.query({
-      text: "SELECT * FROM file WHERE sha = $1",
-      values: [sha],
-    });
+    const existingFile = await db
+      .prepare("SELECT * FROM file WHERE sha = ?")
+      .get(sha);
 
     // check if the file already exists in the database
-    if (existingFile.rows.length > 0) {
-      fileId = existingFile.rows[0].id;
+    if (existingFile) {
+      fileId = existingFile.id;
     } else {
       // if the file doesn't exist, insert it into the database
-      const insertResult = await db.query({
-        text: "INSERT INTO file (contents, sha) VALUES ($1, $2) RETURNING id",
-        values: [contents, sha],
-      });
-      fileId = insertResult.rows[0].id;
+      const insertResult = await db
+        .prepare("INSERT INTO file (contents, sha) VALUES (?, ?)")
+        .run(contents, sha);
+      fileId = insertResult.lastInsertRowid;
     }
 
-    await db.query({
-      text: "INSERT INTO snapshot_file (snapshot_id, file_id, path) VALUES ($1, $2, $3)",
-      values: [snapshotId, fileId, `${subdirectoryName}${fileName}`],
-    });
+    await db
+      .prepare(
+        "INSERT INTO snapshot_file (snapshot_id, file_id, path) VALUES (?, ?, ?)"
+      )
+      .run(snapshotId, fileId, `${subdirectoryName}${fileName}`);
   }
 };
 
 const snapshot = async (db, directoryName) => {
-  const newSnapshot = await db.query({
-    text: "INSERT INTO snapshot (directory_name) VALUES ($1) RETURNING id",
-    values: [directoryName],
-  });
+  const newSnapshot = await db
+    .prepare("INSERT INTO snapshot (directory_name) VALUES (?)")
+    .run(directoryName);
 
-  await snapshotDirectory(db, directoryName, newSnapshot.rows[0].id);
+  await snapshotDirectory(db, directoryName, newSnapshot.lastInsertRowid);
 };
 
 export default snapshot;

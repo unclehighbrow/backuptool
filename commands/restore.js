@@ -1,12 +1,13 @@
 import fs from "fs/promises";
 
 const restore = async (db, snapshotId, outputDirectory) => {
-  const files = await db.query({
-    text: "SELECT contents, path FROM snapshot_file JOIN file ON snapshot_file.file_id=file.id WHERE snapshot_id = $1",
-    values: [snapshotId],
-  });
+  const files = await db
+    .prepare(
+      "SELECT contents, path FROM snapshot_file JOIN file ON snapshot_file.file_id=file.id WHERE snapshot_id = ?"
+    )
+    .all(snapshotId);
 
-  for (const file of files.rows) {
+  for (const file of files) {
     // Ensure the directory exists
     const directoriesToMake = `${outputDirectory}/${file.path.substring(
       0,
